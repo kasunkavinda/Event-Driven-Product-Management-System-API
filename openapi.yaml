@@ -1,0 +1,78 @@
+openapi: 3.1.1
+info:
+  title: E-commerce Product API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+paths:
+  /products:
+    get:
+      summary: List products for current seller
+      parameters:
+        - in: header
+          name: x-seller-id
+          schema: { type: string }
+          required: true
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Create product
+      parameters:
+        - in: header
+          name: x-seller-id
+          schema: { type: string }
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '201': { description: Created }
+  /products/{id}:
+    put:
+      summary: Update product
+      parameters:
+        - in: header
+          name: x-seller-id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '200': { description: Updated }
+    delete:
+      summary: Delete product
+      parameters:
+        - in: header
+          name: x-seller-id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204': { description: Deleted }
+  /events/stream:
+    get:
+      summary: Server-Sent Events stream
+      responses:
+        '200': { description: text/event-stream }
+components:
+  schemas:
+    ProductInput:
+      type: object
+      required: [name, price, quantity, category]
+      properties:
+        name: { type: string }
+        price: { type: number, format: float }
+        quantity: { type: integer }
+        category: { type: string }

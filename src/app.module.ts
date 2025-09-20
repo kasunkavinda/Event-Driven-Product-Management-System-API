@@ -8,6 +8,7 @@ import { DdbService } from './storage/ddb.service';
 import { ProductsModule } from './products/products.module';
 import { EventsModule } from './events/events.module';
 import { SseModule } from './common/sse/sse.module';
+import { ExportModule } from './products/export.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SseModule } from './common/sse/sse.module';
     KafkaModule,
     ProductsModule,
     EventsModule,
+    ExportModule,
   ],
 
   controllers: [AppController],

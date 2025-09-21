@@ -9,31 +9,20 @@ This project is an **Event-Driven Product Management System API** designed to he
 ## Project setup
 
 ```bash
-$ pnpm install
-```
+docker compose up -d
 
-## Compile and run the project
+export AWS_ACCESS_KEY_ID=dummy
+export AWS_SECRET_ACCESS_KEY=dummy
+export AWS_DEFAULT_REGION=us-east-1
 
-```bash
-# development
-$ pnpm run start
+aws dynamodb create-table \
+  --table-name EventLog \
+  --attribute-definitions AttributeName=PK,AttributeType=S AttributeName=SK,AttributeType=S \
+  --key-schema AttributeName=PK,KeyType=HASH AttributeName=SK,KeyType=RANGE \
+  --billing-mode PAY_PER_REQUEST \
+  --endpoint-url http://localhost:8000
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+pnpm install
+npx prisma migrate dev
+pnpm start:dev
 ```

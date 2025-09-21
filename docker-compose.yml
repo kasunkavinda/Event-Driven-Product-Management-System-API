@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: appdb
+    ports: ["5433:5433"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+
+  redpanda:
+    image: redpandadata/redpanda:v24.2.13
+    command:
+      - redpanda start --set redpanda.enable_sasl=false --overprovisioned --smp 1 --memory 512M --reserve-memory 0M --node-id 0 --check=false
+    ports:
+      - "9092:9092"
+      - "9644:9644"
+    volumes: [rpdata:/var/lib/redpanda/data]
+
+  rp-console:
+    image: redpandadata/console:latest
+    ports: ["8080:8080"]
+    environment:
+      KAFKA_BROKERS: redpanda:9092
+      REDPANDA_ADMIN_API: http://redpanda:9644
+    depends_on: [redpanda]
+
+  dynamodb:
+    image: amazon/dynamodb-local:2.5.2
+    ports: ["8000:8000"]
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
+
+volumes:
+  pgdata:
+  rpdata:

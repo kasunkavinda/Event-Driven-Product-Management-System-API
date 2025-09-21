@@ -3,7 +3,7 @@ import { PrismaClient, Product } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { KafkaService } from '../kafka/kafka.service';
 import { TOPIC } from '../events/events.types';
-import { err, Result } from 'src/util/util';
+import { err, Result } from '../util/util';
 
 @Injectable()
 export class ProductsService {

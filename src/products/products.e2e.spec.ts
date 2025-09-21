@@ -1,4 +1,3 @@
-// backend/test/products.service.spec.ts
 import { Test } from '@nestjs/testing';
 import { ProductsService } from './products.service';
 import { KafkaService } from '../kafka/kafka.service';
@@ -33,7 +32,7 @@ const kafkaMock = {
 
 const cfgMock = {
   get: jest.fn((key: string) => {
-    if (key === 'LOW_STOCK_THRESHOLD') return 5; // default threshold for tests
+    if (key === 'LOW_STOCK_THRESHOLD') return 5;
     return undefined;
   }),
 };
@@ -56,7 +55,7 @@ describe('ProductsService (unit)', () => {
   let prisma: MockedPrisma;
 
   beforeEach(async () => {
-    jest.useFakeTimers(); // avoid real timers if any show up
+    jest.useFakeTimers();
     const moduleRef = await Test.createTestingModule({
       providers: [
         ProductsService,
@@ -67,7 +66,7 @@ describe('ProductsService (unit)', () => {
 
     service = moduleRef.get(ProductsService);
     prisma = makePrismaMock();
-    // overwrite the internal prisma instance created via `new PrismaClient()`
+
     (service as any).prisma = prisma;
 
     kafkaMock.emit.mockClear();
@@ -136,7 +135,7 @@ describe('ProductsService (unit)', () => {
       } as any);
 
       expect(out.success).toBe(true);
-      // ProductCreated + LowStockWarning
+
       expect(kafkaMock.emit).toHaveBeenCalledTimes(2);
       expect(kafkaMock.emit).toHaveBeenNthCalledWith(
         1,
@@ -168,7 +167,9 @@ describe('ProductsService (unit)', () => {
         updatedAt: new Date(),
       } as any);
       expect(out.success).toBe(false);
-      //   expect(out.error).toBeDefined();
+      if (!out.success) {
+        expect(out.error).toBeDefined();
+      }
       expect(kafkaMock.emit).not.toHaveBeenCalled();
     });
   });
@@ -195,7 +196,6 @@ describe('ProductsService (unit)', () => {
         where: { id: 5, sellerId: 's1' },
       });
 
-      // Only ProductUpdated
       expect(kafkaMock.emit).toHaveBeenCalledTimes(1);
       expect(kafkaMock.emit).toHaveBeenCalledWith(
         TOPIC,
@@ -214,7 +214,6 @@ describe('ProductsService (unit)', () => {
 
       expect(out.success).toBe(true);
 
-      // ProductUpdated + LowStockWarning
       expect(kafkaMock.emit).toHaveBeenCalledTimes(2);
       expect(kafkaMock.emit).toHaveBeenNthCalledWith(
         1,
@@ -237,7 +236,9 @@ describe('ProductsService (unit)', () => {
       prisma.product.updateMany.mockRejectedValue(new Error('boom'));
       const out = await service.update('s1', 1, { quantity: 1 });
       expect(out.success).toBe(false);
-      //   expect(out.error).toBeDefined();
+      if (!out.success) {
+        expect(out.error).toBeDefined();
+      }
     });
   });
 
@@ -270,7 +271,9 @@ describe('ProductsService (unit)', () => {
       prisma.product.deleteMany.mockRejectedValue(new Error('nope'));
       const out = await service.remove('s1', 1);
       expect(out.success).toBe(false);
-      //   expect(out.error).toBeDefined();
+      if (!out.success) {
+        expect(out.error).toBeDefined();
+      }
     });
   });
 });
